@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import app.aaps.core.interfaces.configuration.Config;
 import app.aaps.core.interfaces.logging.AAPSLogger;
 import app.aaps.core.interfaces.logging.LTag;
 import app.aaps.core.interfaces.resources.ResourceHelper;
@@ -68,6 +69,7 @@ public class RFSpy {
     @Inject RileyLinkServiceData rileyLinkServiceData;
     @Inject RileyLinkUtil rileyLinkUtil;
     @Inject RxBus rxBus;
+    @Inject Config config;
     private RFSpyReader reader;
     private String bleVersion; // We don't use it so no need of sofisticated logic
     private Double currentFrequencyMHz;
@@ -193,7 +195,7 @@ public class RFSpy {
     }
 
     private byte[] writeToDataRaw(@NonNull byte[] bytes, int responseTimeout_ms) {
-        SystemClock.sleep(100);
+        SystemClock.sleep(config.enableFastRileyLinkMode() ? 1: 100);
         // FIXME drain read queue?
         byte[] junkInBuffer = reader.poll(0);
 

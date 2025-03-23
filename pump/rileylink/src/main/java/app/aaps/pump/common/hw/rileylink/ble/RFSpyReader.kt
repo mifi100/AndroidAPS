@@ -1,6 +1,7 @@
 package app.aaps.pump.common.hw.rileylink.ble
 
 import android.os.SystemClock
+import app.aaps.core.interfaces.configuration.Config
 import app.aaps.core.interfaces.logging.AAPSLogger
 import app.aaps.core.interfaces.logging.LTag
 import app.aaps.core.utils.pump.ByteUtil
@@ -13,6 +14,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Created by geoff on 5/26/16.
@@ -25,6 +27,7 @@ class RFSpyReader internal constructor(private val aapsLogger: AAPSLogger, priva
     private var acquireCount = 0
     private var releaseCount = 0
     private var stopAtNull = true
+    @Inject lateinit var config: Config
     fun setRileyLinkEncodingType(encodingType: RileyLinkEncodingType) {
         aapsLogger.debug("setRileyLinkEncodingType: $encodingType")
         stopAtNull = !(encodingType == RileyLinkEncodingType.Manchester || encodingType == RileyLinkEncodingType.FourByteSixByteRileyLink)
@@ -67,9 +70,9 @@ class RFSpyReader internal constructor(private val aapsLogger: AAPSLogger, priva
                     acquireCount++
                     waitForRadioData.acquire()
                     aapsLogger.debug(LTag.PUMPBTCOMM, "${ThreadUtil.sig()}waitForRadioData acquired (count=$acquireCount) at t=${SystemClock.uptimeMillis()}")
-                    SystemClock.sleep(100)
+                    SystemClock.sleep(if(config.enableFastRileyLinkMode()) 1 else 100)
                     result = rileyLinkBle.readCharacteristicBlocking(serviceUUID, radioDataUUID)
-                    SystemClock.sleep(100)
+                    SystemClock.sleep(if(config.enableFastRileyLinkMode()) 1 else 100)
                     if (result.resultCode == BLECommOperationResult.RESULT_SUCCESS) {
                         if (stopAtNull) {
                             // only data up to the first null is valid
