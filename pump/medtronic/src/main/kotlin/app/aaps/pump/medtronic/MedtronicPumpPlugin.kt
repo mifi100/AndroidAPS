@@ -345,6 +345,7 @@ class MedtronicPumpPlugin @Inject constructor(
             if (rileyLinkServiceState != RileyLinkServiceState.PumpConnectorReady
                 && rileyLinkServiceState != RileyLinkServiceState.RileyLinkReady
                 && rileyLinkServiceState != RileyLinkServiceState.TuneUpDevice
+                && rileyLinkServiceState != RileyLinkServiceState.PumpConnectorError
             ) {
                 aapsLogger.debug(LTag.PUMP, "RileyLink unreachable.")
                 return false
