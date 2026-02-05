@@ -16,6 +16,7 @@ import app.aaps.pump.common.hw.rileylink.ble.RileyLinkCommunicationException
 import app.aaps.pump.common.hw.rileylink.ble.data.RadioPacket
 import app.aaps.pump.common.hw.rileylink.ble.data.RadioResponse
 import app.aaps.pump.common.hw.rileylink.ble.defs.RLMessageType
+import app.aaps.pump.common.hw.rileylink.defs.RileyLinkServiceState
 import app.aaps.pump.common.hw.rileylink.keys.RileyLinkLongKey
 import app.aaps.pump.common.hw.rileylink.service.RileyLinkServiceData
 import app.aaps.pump.common.hw.rileylink.service.tasks.ServiceTaskExecutor
@@ -180,6 +181,9 @@ class MedtronicCommunicationManager @Inject constructor(
                             )
                         )
                         if (valid) {
+                            if (rileyLinkServiceData.rileyLinkServiceState == RileyLinkServiceState.PumpConnectorError) {
+                                rileyLinkServiceData.setServiceState(RileyLinkServiceState.PumpConnectorReady)
+                            }
                             if (state === PumpDeviceState.PumpUnreachable)
                                 medtronicPumpStatus.pumpDeviceState = PumpDeviceState.WakingUp
                             else
